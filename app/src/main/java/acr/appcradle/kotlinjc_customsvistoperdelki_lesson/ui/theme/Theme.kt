@@ -1,6 +1,5 @@
 package acr.appcradle.kotlinjc_customsvistoperdelki_lesson.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,6 +8,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -21,17 +23,56 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
+
+data class ButtonColors(
+    val primaryColors: ButtonStateColors,
+    val warningColors: ButtonStateColors
+)
+
+data class ButtonStateColors(
+    val background: Color,
+    val textColor: Color
+)
+
+data class CustomColors(
+    val button: ButtonColors
+)
+
+private val LightCustomColors = CustomColors(
+    button = ButtonColors(
+        primaryColors = ButtonStateColors(
+            background = PrimaryButtonBackgroundLight,
+            textColor = PrimaryButtonTextLightLight
+        ),
+        warningColors = ButtonStateColors(
+            background = WarningButtonBackgroundLight,
+            textColor = WarningButtonTextLightLight
+        )
+    )
+)
+
+private val DarkCustomColors = CustomColors(
+    button = ButtonColors(
+        primaryColors = ButtonStateColors(
+            background = PrimaryButtonBackgroundDark,
+            textColor = PrimaryButtonTextLightDark
+        ),
+        warningColors = ButtonStateColors(
+            background = WarningButtonBackgroundDark,
+            textColor = WarningButtonTextLightDark
+        )
+    )
+)
+
+val LocalCustomColors = staticCompositionLocalOf<CustomColors> {
+    error("No CustomColors provided")
+}
+
+val LocalTypography = staticCompositionLocalOf<CustomTypography> {
+    error("No Typography provided")
+}
+
 
 @Composable
 fun KotlinJC_CustomSvistoperdelki_lessonTheme(
@@ -49,10 +90,16 @@ fun KotlinJC_CustomSvistoperdelki_lessonTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    val customColors = if (darkTheme) DarkCustomColors else LightCustomColors
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalCustomColors provides customColors,
+        LocalTypography provides Typography
+    ) {
+
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content
+        )
+    }
 }
